@@ -2,7 +2,7 @@ const { HttpError, ctrlWrapper } = require("../helpers");
 const { Contact } = require("../models/contact");
 
 const getAllContacts = async (req, res) => {
-  const result = await Contact.find();
+  const result = await Contact.find({}, "-createdAt -updatedAt");
   res.json(result);
 };
 
@@ -24,7 +24,7 @@ const addContact = async (req, res) => {
 
 const deleteContact = async (req, res) => {
   const { contactId } = req.params;
-  const result = Contact.findByIdAndDelete(contactId);
+  const result = await Contact.findByIdAndDelete(contactId);
 
   if (!result) {
     throw HttpError(404, "Not found");
