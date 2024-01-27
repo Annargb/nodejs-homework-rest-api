@@ -21,8 +21,10 @@ const register = async (req, res) => {
   const newUser = await User.create({ ...req.body, password: hashPassword });
 
   res.status(201).json({
-    email: newUser.email,
-    subscription: newUser.subscription,
+    user: {
+      email: newUser.email,
+      subscription: newUser.subscription,
+    },
   });
 };
 
@@ -69,9 +71,26 @@ const logout = async (req, res) => {
   const { _id } = req.user;
   await User.findByIdAndUpdate(_id, { token: "" });
 
-  res.json({
-    message: "Logout success",
+  res.status(204).json({});
+};
+
+const updateSubscription = async (req, res) => {
+  const { userId } = req.params;
+  const newSubscription = req.body.subscription;
+
+  if (!["starter", "pro", "business"].includes(newSubscription)) {
+    throw HttpError(400, "Invalid subscription value");
+  }
+
+  const result = await User.findByIdAndUpdate(userId, req.body, {
+    new: true,
   });
+
+  if (!result) {
+    throw HttpError(404, "Not found");
+  }
+
+  res.json(result);
 };
 
 module.exports = {
@@ -79,4 +98,5 @@ module.exports = {
   login: ctrlWrapper(login),
   getCurrent: ctrlWrapper(getCurrent),
   logout: ctrlWrapper(logout),
+  updateSubscription: ctrlWrapper(updateSubscription),
 };

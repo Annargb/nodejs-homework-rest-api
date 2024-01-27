@@ -11,11 +11,11 @@ const contactSchema = new Schema(
     email: {
       type: String,
       unique: true,
-      required: true,
+      required: [true, "Email is required"],
     },
     phone: {
       type: String,
-      required: true,
+      required: [true, "Phone is required"],
     },
     favorite: {
       type: Boolean,
